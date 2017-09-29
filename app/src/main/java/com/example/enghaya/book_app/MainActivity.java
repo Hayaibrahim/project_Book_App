@@ -1,17 +1,13 @@
 package com.example.enghaya.book_app;
 
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -75,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
         //connectivity
         ConnectivityManager cconnect = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo net = cconnect.getActiveNetworkInfo();
-        return net.isConnectedOrConnecting();
+        boolean isConnected = net != null && net.isConnectedOrConnecting();
+        return isConnected;
     }
 
     public void update(List<Book> books) {
@@ -102,39 +99,6 @@ public class MainActivity extends AppCompatActivity {
         String url = searchbooks + inputforuser;
 
         return url;
-    }
-
-    public class BooksAsyncTask extends AsyncTask<URL, Void, List<Book>> {
-        @Override
-        protected List<Book> doInBackground(URL... urls) {
-            URL url = forUrl(Http());
-            String Josn = "   ";
-            try {
-                Josn = useHttp(url);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            List<Book> book = Bookjosn(Josn);
-            return book;
-        }
-
-        protected void onPostExecute(List<Book> result) {
-            if (result == null) {
-                return;
-            }
-            update(result);
-        }
-
-        private URL forUrl(String http) {
-            try {
-
-                return new URL(http);
-            } catch (MalformedURLException m) {
-                m.printStackTrace();
-                return null;
-            }
-        }
     }
 
     private String useHttp(URL url) throws IOException {
@@ -248,9 +212,42 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Book[] books = new Book[adapter.getCount()];
         for (int i = 0; i < books.length; i++) {
-            books[i] = (Book) adapter.getItem(i);
+            books[i] = adapter.getItem(i);
         }
-        outState.putParcelableArray(search, (Parcelable[]) books);
+        outState.putParcelableArray(search, books);
+    }
+
+    public class BooksAsyncTask extends AsyncTask<URL, Void, List<Book>> {
+        @Override
+        protected List<Book> doInBackground(URL... urls) {
+            URL url = forUrl(Http());
+            String Josn = "   ";
+            try {
+                Josn = useHttp(url);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            List<Book> book = Bookjosn(Josn);
+            return book;
+        }
+
+        protected void onPostExecute(List<Book> result) {
+            if (result == null) {
+                return;
+            }
+            update(result);
+        }
+
+        private URL forUrl(String http) {
+            try {
+
+                return new URL(http);
+            } catch (MalformedURLException m) {
+                m.printStackTrace();
+                return null;
+            }
+        }
     }
 
 

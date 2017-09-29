@@ -55,6 +55,8 @@ public class Query {
                 JSONObject bookInfo = bookObject.getJSONObject("volumeInfo");
 
                 String title = bookInfo.getString("title");
+                if (bookInfo.has("authors")) {
+                }
                 JSONArray authorsArray = bookInfo.getJSONArray("authors");
                 String authors = formatListOfAuthors(authorsArray);
 
@@ -65,7 +67,6 @@ public class Query {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
-            Log.e("QueryUtils", "Problem parsing the Book JSON results", e);
             e.printStackTrace();
         }
         // Return the list of books
